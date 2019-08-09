@@ -1,12 +1,36 @@
 import Nav from '../components/nav'
 import DonateForm from '../components/donateform'
+import PaypalExpressBtn from '../components/PayPalExpressCheckOut';
 import Head from '../components/head'
 import { Elements, StripeProvider } from 'react-stripe-elements'
 import { Component } from 'react'
 import '../static/styles/main.scss'
 
+const CLIENT = {
+  sandbox: '125465172765',
+  production: 'xxxXXX',
+}
+let currency = 'USD'; // or you can set this value from your props or state   
+let total = 1; // same as above, this is the total amount (based on currency) to be paid by using Paypal express checkout 
+       
+
 class Donate extends Component {
   render () {
+
+        const onSuccess = (payment) => {
+            console.log("Your payment was succeeded!", payment);
+        }         
+        const onCancel = (data) => {
+            // User pressed "cancel" or close Paypal's popup! 
+            console.log('You have cancelled the payment!', data);
+        }         
+        const onError = (err) => {
+         // The main Paypal's script cannot be loaded or somethings block the loading of that script! 
+                    console.log("Error!", err);
+        // Since the Paypal's main script is loaded asynchronously from "https://www.paypalobjects.com/api/checkout.js" 
+        // => sometimes it may take about 0.5 second for everything to get set, or for the button to appear      
+        }               
+         
     return (
       <div>
         <Head title='Donate' />
@@ -31,6 +55,18 @@ class Donate extends Component {
                 </Elements>
               </div>
             </StripeProvider>
+            <div className='w-120-ns m-auto'>
+              <Elements>
+                    <PaypalExpressBtn 
+                      client={CLIENT}
+                      currency={currency}
+                      total={total}
+                      onError={onError}
+                      onSuccess={onSuccess}
+                      onCancel={onCancel}
+                    />
+                </Elements>
+            </div>
           </div>
           }
         </div>
